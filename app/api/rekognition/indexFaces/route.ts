@@ -1,5 +1,3 @@
-// app/api/indexFace.ts
-
 import { NextRequest, NextResponse } from "next/server"
 import {
   IndexFacesCommand,

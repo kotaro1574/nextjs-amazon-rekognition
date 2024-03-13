@@ -31,7 +31,7 @@ export function IndexFacesForm() {
         alert("Please select a file to upload.")
         return
       }
-      const response = await fetch("/api/rekognition/indexFaces", {
+      const response = await fetch("/api/s3/create-presigned-post", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -57,11 +57,26 @@ export function IndexFacesForm() {
         })
 
         if (uploadResponse.ok) {
-          alert("Upload successful!")
-          router.push("/")
-          startTransition(() => {
-            router.refresh()
-          })
+          const indexFacesResponse = await fetch(
+            "/api/rekognition/index-faces",
+            {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({ key }),
+            }
+          )
+          if (indexFacesResponse.ok) {
+            alert("Face indexed successfully.")
+            router.push("/")
+            startTransition(() => {
+              router.refresh()
+            })
+          } else {
+            console.error("Index Faces Error:", indexFacesResponse)
+            alert("Failed to index face.")
+          }
         } else {
           console.error("S3 Upload Error:", uploadResponse)
           alert("Upload failed.")

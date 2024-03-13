@@ -3,9 +3,6 @@ import {
   IndexFacesCommand,
   RekognitionClient,
 } from "@aws-sdk/client-rekognition"
-import { GetObjectCommand, S3Client } from "@aws-sdk/client-s3"
-import { createPresignedPost } from "@aws-sdk/s3-presigned-post"
-import { v4 as uuidv4 } from "uuid"
 
 const credentials = {
   accessKeyId: process.env.AWS_ACCESS_KEY_ID as string,

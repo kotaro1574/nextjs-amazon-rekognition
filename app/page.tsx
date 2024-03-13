@@ -1,4 +1,4 @@
-import { IndexFacesForm } from "./index-faces-form"
+import Link from "next/link"
 
 export default function IndexPage() {
   return (
@@ -13,9 +13,7 @@ export default function IndexPage() {
           into your apps. Free. Open Source. And Next.js 13 Ready.
         </p>
       </div>
-      <div>
-        <IndexFacesForm />
-      </div>
+      <Link href="/upload">index faces</Link>
     </section>
   )
 }

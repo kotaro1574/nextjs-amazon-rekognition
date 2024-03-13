@@ -16,6 +16,7 @@
   "dependencies": {
     "@aws-sdk/client-rekognition": "^3.529.1",
     "@aws-sdk/client-s3": "^3.529.1",
+    "@aws-sdk/s3-presigned-post": "^3.529.1",
     "@hookform/resolvers": "^3.3.4",
     "@radix-ui/react-label": "^2.0.2",
     "@radix-ui/react-slot": "^1.0.2",

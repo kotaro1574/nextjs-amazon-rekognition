@@ -1,3 +1,5 @@
+import { SearchFacesForm } from "./search-faces-form"
+
 export default function SearchFacesPage() {
   return (
     <section className="container grid items-center gap-6 pb-8 pt-6 md:py-10">
@@ -6,7 +8,9 @@ export default function SearchFacesPage() {
           Search Faces
         </h1>
       </div>
-      <div></div>
+      <div>
+        <SearchFacesForm />
+      </div>
     </section>
   )
 }

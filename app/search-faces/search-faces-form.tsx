@@ -26,10 +26,41 @@ export function SearchFacesForm() {
 
   const onSubmit = async (data: z.infer<typeof formSchema>) => {
     setUploading(true)
+
+    // ファイルが選択されていない場合は処理を中断します。
+    if (!data.imageFile) {
+      alert("Please select an image to upload.")
+      setUploading(false)
+      return
+    }
+
     try {
+      // 画像ファイルをbase64に変換します。
+      const reader = new FileReader()
+      reader.readAsDataURL(data.imageFile)
+      reader.onloadend = async () => {
+        const base64Data = reader.result?.toString().split(",")[1] || ""
+
+        // base64エンコードされた画像データをAPIにPOSTリクエストとして送信します。
+        const response = await fetch("/api/rekognition/search-faces-by-image", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ image: base64Data }),
+        })
+
+        const result = await response.json()
+        if (response.ok) {
+          alert("Face search successful!")
+          console.log("Search result:", result)
+        } else {
+          alert(`Face search failed: ${result.error}`)
+        }
+      }
     } catch (error) {
-      console.error("Error submitting form:", error)
-      alert("Failed to index face due to a network or other error")
+      alert("Failed to upload image. Please try again.")
+      console.error("onSubmit error:", error)
     } finally {
       setUploading(false)
     }
@@ -85,7 +116,7 @@ export function SearchFacesForm() {
           control={form.control}
         />
         <Button disabled={uploading} type="submit">
-          {uploading ? "loading..." : "index face"}
+          {uploading ? "loading..." : "search faces"}
         </Button>
       </form>
     </Form>

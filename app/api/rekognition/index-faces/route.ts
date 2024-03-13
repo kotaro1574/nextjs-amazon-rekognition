@@ -21,6 +21,7 @@ export async function POST(request: NextRequest) {
     const response = await rekognitionClient.send(
       new IndexFacesCommand({
         CollectionId: process.env.AMPLIFY_BUCKET,
+        ExternalImageId: key,
         Image: {
           S3Object: {
             Bucket: process.env.AMPLIFY_BUCKET,

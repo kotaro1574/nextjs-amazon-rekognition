@@ -9,7 +9,10 @@ import { z } from "zod"
 
 import { Button, buttonVariants } from "@/components/ui/button"
 import { Form, FormItem, FormLabel } from "@/components/ui/form"
-import { FaceBoundingBoxesImage } from "@/components/face-bounding-boxes-image"
+import {
+  Face,
+  FaceBoundingBoxesImage,
+} from "@/components/face-bounding-boxes-image"
 
 const formSchema = z.object({
   imageFile: z.custom<File>().nullable(),
@@ -17,9 +20,8 @@ const formSchema = z.object({
 
 export function IndexFacesForm() {
   const [uploading, setUploading] = useState(false)
-  const [rekognitionResponse, setRekognitionResponse] =
-    useState<IndexFacesResponse>()
-  console.log("IndexFacesForm", { rekognitionResponse })
+  const [faces, setFaces] = useState<Face[]>([])
+
   const router = useRouter()
   const form = useForm<z.infer<typeof formSchema>>({
     defaultValues: {
@@ -73,8 +75,21 @@ export function IndexFacesForm() {
           )
 
           if (indexFacesResponse.ok) {
-            const indexFacesResponseResult = await indexFacesResponse.json()
-            setRekognitionResponse(indexFacesResponseResult.response)
+            const _indexFacesResult = await indexFacesResponse.json()
+            const indexFacesResult: IndexFacesResponse =
+              _indexFacesResult.response
+
+            setFaces(
+              indexFacesResult.FaceRecords?.map((FaceRecord) => ({
+                boundingBox: {
+                  Left: FaceRecord.Face?.BoundingBox?.Left ?? 0,
+                  Top: FaceRecord.Face?.BoundingBox?.Top ?? 0,
+                  Width: FaceRecord.Face?.BoundingBox?.Width ?? 0,
+                  Height: FaceRecord.Face?.BoundingBox?.Height ?? 0,
+                },
+                confidence: FaceRecord.Face?.Confidence ?? 0,
+              })) ?? []
+            )
             // router.push("/")
             // startTransition(() => {
             //   router.refresh()
@@ -108,9 +123,7 @@ export function IndexFacesForm() {
               {value && (
                 <FaceBoundingBoxesImage
                   imageUrl={URL.createObjectURL(value)}
-                  rekognitionResponse={
-                    rekognitionResponse ?? { FaceRecords: [] }
-                  }
+                  faces={faces}
                 />
               )}
               <div className="relative">

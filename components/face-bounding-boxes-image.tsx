@@ -2,19 +2,25 @@
 
 import React, { useEffect, useRef, useState } from "react"
 import Image from "next/image"
-import { IndexFacesResponse } from "@aws-sdk/client-rekognition"
 
 import { AspectRatio } from "./ui/aspect-ratio"
 
-type Props = {
-  imageUrl: string
-  rekognitionResponse: IndexFacesResponse
+export type Face = {
+  boundingBox: {
+    Left: number
+    Top: number
+    Width: number
+    Height: number
+  }
+  confidence: number
 }
 
-export function FaceBoundingBoxesImage({
-  imageUrl,
-  rekognitionResponse,
-}: Props) {
+type Props = {
+  imageUrl: string
+  faces: Face[]
+}
+
+export function FaceBoundingBoxesImage({ imageUrl, faces }: Props) {
   const containerRef = useRef<HTMLDivElement>(null)
   const [containerSize, setContainerSize] = useState<{
     width: number
@@ -40,13 +46,9 @@ export function FaceBoundingBoxesImage({
           className="rounded-md object-cover"
         />
       </AspectRatio>
-      {rekognitionResponse.FaceRecords?.map((FaceRecord, index) => {
-        if (!FaceRecord.Face) return null
-        if (!FaceRecord.Face.BoundingBox) return null
-        const { Left, Top, Width, Height } = FaceRecord.Face.BoundingBox
-        const confidenceText = `Confidence: ${FaceRecord.Face.Confidence?.toFixed(
-          2
-        )}%`
+      {faces.map((face, index) => {
+        const { Left, Top, Width, Height } = face.boundingBox
+        const confidenceText = `Confidence: ${face.confidence.toFixed(2)}%`
 
         return (
           <React.Fragment key={index}>

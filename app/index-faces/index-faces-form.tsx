@@ -74,10 +74,6 @@ export function IndexFacesForm() {
 
           if (indexFacesResponse.ok) {
             const indexFacesResponseResult = await indexFacesResponse.json()
-            console.log(
-              "Face indexed successfully.",
-              indexFacesResponseResult as IndexFacesResponse
-            )
             setRekognitionResponse(indexFacesResponseResult.response)
             // router.push("/")
             // startTransition(() => {

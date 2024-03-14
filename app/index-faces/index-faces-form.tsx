@@ -1,15 +1,15 @@
 "use client"
 
-import { startTransition, useState } from "react"
-import Image from "next/image"
+import { useState } from "react"
 import { useRouter } from "next/navigation"
+import { IndexFacesResponse } from "@aws-sdk/client-rekognition"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { Controller, useForm } from "react-hook-form"
 import { z } from "zod"
 
-import { AspectRatio } from "@/components/ui/aspect-ratio"
 import { Button, buttonVariants } from "@/components/ui/button"
 import { Form, FormItem, FormLabel } from "@/components/ui/form"
+import { FaceBoundingBoxesImage } from "@/components/face-bounding-boxes-image"
 
 const formSchema = z.object({
   imageFile: z.custom<File>().nullable(),
@@ -17,6 +17,9 @@ const formSchema = z.object({
 
 export function IndexFacesForm() {
   const [uploading, setUploading] = useState(false)
+  const [rekognitionResponse, setRekognitionResponse] =
+    useState<IndexFacesResponse>()
+  console.log("IndexFacesForm", { rekognitionResponse })
   const router = useRouter()
   const form = useForm<z.infer<typeof formSchema>>({
     defaultValues: {
@@ -69,13 +72,17 @@ export function IndexFacesForm() {
             }
           )
 
-          const indexFacesResponseResult = await indexFacesResponse.json()
-          if (indexFacesResponseResult.ok) {
-            console.log("Face indexed successfully.", indexFacesResponseResult)
-            router.push("/")
-            startTransition(() => {
-              router.refresh()
-            })
+          if (indexFacesResponse.ok) {
+            const indexFacesResponseResult = await indexFacesResponse.json()
+            console.log(
+              "Face indexed successfully.",
+              indexFacesResponseResult as IndexFacesResponse
+            )
+            setRekognitionResponse(indexFacesResponseResult.response)
+            // router.push("/")
+            // startTransition(() => {
+            //   router.refresh()
+            // })
           } else {
             console.error("Index Faces Error:", indexFacesResponse)
             alert("Failed to index face.")
@@ -103,14 +110,12 @@ export function IndexFacesForm() {
             <FormItem>
               <FormLabel htmlFor="imageFile">Image</FormLabel>
               {value && (
-                <AspectRatio ratio={1}>
-                  <Image
-                    src={URL.createObjectURL(value)}
-                    alt="Uploaded Image"
-                    fill
-                    className="rounded-md object-cover"
-                  />
-                </AspectRatio>
+                <FaceBoundingBoxesImage
+                  imageUrl={URL.createObjectURL(value)}
+                  rekognitionResponse={
+                    rekognitionResponse ?? { FaceRecords: [] }
+                  }
+                />
               )}
               <div className="relative">
                 <label

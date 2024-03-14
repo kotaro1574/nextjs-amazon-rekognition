@@ -67,8 +67,10 @@ export function IndexFacesForm() {
               body: JSON.stringify({ key }),
             }
           )
-          if (indexFacesResponse.ok) {
-            alert("Face indexed successfully.")
+
+          const indexFacesResponseResult = await indexFacesResponse.json()
+          if (indexFacesResponseResult.ok) {
+            console.log("Face indexed successfully.", indexFacesResponseResult)
             router.push("/")
             startTransition(() => {
               router.refresh()

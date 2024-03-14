@@ -7,6 +7,7 @@ import { zodResolver } from "@hookform/resolvers/zod"
 import { Controller, useForm } from "react-hook-form"
 import { z } from "zod"
 
+import { AspectRatio } from "@/components/ui/aspect-ratio"
 import { Button, buttonVariants } from "@/components/ui/button"
 import { Form, FormItem, FormLabel } from "@/components/ui/form"
 
@@ -102,12 +103,14 @@ export function IndexFacesForm() {
             <FormItem>
               <FormLabel htmlFor="imageFile">Image</FormLabel>
               {value && (
-                <Image
-                  src={URL.createObjectURL(value)}
-                  alt="Uploaded Image"
-                  width={600}
-                  height={600}
-                />
+                <AspectRatio ratio={1}>
+                  <Image
+                    src={URL.createObjectURL(value)}
+                    alt="Uploaded Image"
+                    fill
+                    className="rounded-md object-cover"
+                  />
+                </AspectRatio>
               )}
               <div className="relative">
                 <label
@@ -143,7 +146,7 @@ export function IndexFacesForm() {
           name="imageFile"
           control={form.control}
         />
-        {form.formState.errors.imageFile && (
+        {form.getValues("imageFile") && (
           <Button disabled={uploading} type="submit">
             {uploading ? "loading..." : "index face"}
           </Button>

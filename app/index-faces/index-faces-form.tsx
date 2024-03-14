@@ -105,16 +105,16 @@ export function IndexFacesForm() {
                 <Image
                   src={URL.createObjectURL(value)}
                   alt="Uploaded Image"
-                  width={200}
-                  height={200}
+                  width={600}
+                  height={600}
                 />
               )}
-              <div style={{ width: "200px" }} className="relative">
+              <div className="relative">
                 <label
                   className={`${buttonVariants({
                     variant: "default",
                     size: "default",
-                  })} mt-2 block w-full`}
+                  })} mt-2`}
                   htmlFor="single"
                 >
                   {uploading ? "Uploading ..." : "Upload"}
@@ -143,9 +143,11 @@ export function IndexFacesForm() {
           name="imageFile"
           control={form.control}
         />
-        <Button disabled={uploading} type="submit">
-          {uploading ? "loading..." : "index face"}
-        </Button>
+        {form.formState.errors.imageFile && (
+          <Button disabled={uploading} type="submit">
+            {uploading ? "loading..." : "index face"}
+          </Button>
+        )}
       </form>
     </Form>
   )

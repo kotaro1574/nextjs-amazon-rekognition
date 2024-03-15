@@ -2,17 +2,14 @@
 
 import { useState } from "react"
 import { useRouter } from "next/navigation"
-import { IndexFacesResponse } from "@aws-sdk/client-rekognition"
+import { Face, IndexFacesResponse } from "@aws-sdk/client-rekognition"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { Controller, useForm } from "react-hook-form"
 import { z } from "zod"
 
 import { Button, buttonVariants } from "@/components/ui/button"
 import { Form, FormItem, FormLabel } from "@/components/ui/form"
-import {
-  Face,
-  FaceBoundingBoxesImage,
-} from "@/components/face-bounding-boxes-image"
+import { FaceBoundingBoxesImage } from "@/components/face-bounding-boxes-image"
 
 const formSchema = z.object({
   imageFile: z.custom<File>().nullable(),
@@ -81,13 +78,13 @@ export function IndexFacesForm() {
 
             setFaces(
               indexFacesResult.FaceRecords?.map((FaceRecord) => ({
-                boundingBox: {
+                BoundingBox: {
                   Left: FaceRecord.Face?.BoundingBox?.Left ?? 0,
                   Top: FaceRecord.Face?.BoundingBox?.Top ?? 0,
                   Width: FaceRecord.Face?.BoundingBox?.Width ?? 0,
                   Height: FaceRecord.Face?.BoundingBox?.Height ?? 0,
                 },
-                confidence: FaceRecord.Face?.Confidence ?? 0,
+                Confidence: FaceRecord.Face?.Confidence ?? 0,
               })) ?? []
             )
             // router.push("/")

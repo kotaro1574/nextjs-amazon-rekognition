@@ -2,18 +2,9 @@
 
 import React, { useEffect, useRef, useState } from "react"
 import Image from "next/image"
+import { Face } from "@aws-sdk/client-rekognition"
 
 import { AspectRatio } from "./ui/aspect-ratio"
-
-export type Face = {
-  boundingBox: {
-    Left: number
-    Top: number
-    Width: number
-    Height: number
-  }
-  confidence: number
-}
 
 type Props = {
   imageUrl: string
@@ -47,8 +38,9 @@ export function FaceBoundingBoxesImage({ imageUrl, faces }: Props) {
         />
       </AspectRatio>
       {faces.map((face, index) => {
-        const { Left, Top, Width, Height } = face.boundingBox
-        const confidenceText = `Confidence: ${face.confidence.toFixed(2)}%`
+        if (!face.BoundingBox) return null
+        const { Left, Top, Width, Height } = face.BoundingBox
+        const confidenceText = `Confidence: ${face.Confidence?.toFixed(2)}%`
 
         return (
           <React.Fragment key={index}>

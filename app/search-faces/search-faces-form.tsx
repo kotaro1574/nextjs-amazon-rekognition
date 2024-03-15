@@ -1,24 +1,25 @@
 "use client"
 
-import { useState } from "react"
+import { Dispatch, SetStateAction, useState } from "react"
 import { useRouter } from "next/navigation"
-import { SearchFacesByImageResponse } from "@aws-sdk/client-rekognition"
+import { Face, SearchFacesByImageResponse } from "@aws-sdk/client-rekognition"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { Controller, useForm } from "react-hook-form"
 import { z } from "zod"
 
 import { Button, buttonVariants } from "@/components/ui/button"
 import { Form, FormItem, FormLabel } from "@/components/ui/form"
-import {
-  Face,
-  FaceBoundingBoxesImage,
-} from "@/components/face-bounding-boxes-image"
+import { FaceBoundingBoxesImage } from "@/components/face-bounding-boxes-image"
 
 const formSchema = z.object({
   imageFile: z.custom<File>().nullable(),
 })
 
-export function SearchFacesForm() {
+type Props = {
+  setMatchFaces: Dispatch<SetStateAction<Face[]>>
+}
+
+export function SearchFacesForm({ setMatchFaces }: Props) {
   const [uploading, setUploading] = useState(false)
   const [faces, setFaces] = useState<Face[]>([])
   const router = useRouter()
@@ -61,13 +62,13 @@ export function SearchFacesForm() {
 
           setFaces([
             {
-              boundingBox: {
+              BoundingBox: {
                 Width: result.SearchedFaceBoundingBox?.Width ?? 0,
                 Height: result.SearchedFaceBoundingBox?.Height ?? 0,
                 Left: result.SearchedFaceBoundingBox?.Left ?? 0,
                 Top: result.SearchedFaceBoundingBox?.Top ?? 0,
               },
-              confidence: result.SearchedFaceConfidence ?? 0,
+              Confidence: result.SearchedFaceConfidence ?? 0,
             },
           ])
           console.log("Search result:", result)

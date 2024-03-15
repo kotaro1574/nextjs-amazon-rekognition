@@ -1,14 +1,18 @@
 "use client"
 
 import { useState } from "react"
-import Image from "next/image"
 import { useRouter } from "next/navigation"
+import { SearchFacesByImageResponse } from "@aws-sdk/client-rekognition"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { Controller, useForm } from "react-hook-form"
 import { z } from "zod"
 
 import { Button, buttonVariants } from "@/components/ui/button"
 import { Form, FormItem, FormLabel } from "@/components/ui/form"
+import {
+  Face,
+  FaceBoundingBoxesImage,
+} from "@/components/face-bounding-boxes-image"
 
 const formSchema = z.object({
   imageFile: z.custom<File>().nullable(),
@@ -16,6 +20,7 @@ const formSchema = z.object({
 
 export function SearchFacesForm() {
   const [uploading, setUploading] = useState(false)
+  const [faces, setFaces] = useState<Face[]>([])
   const router = useRouter()
   const form = useForm<z.infer<typeof formSchema>>({
     defaultValues: {
@@ -50,12 +55,24 @@ export function SearchFacesForm() {
           body: JSON.stringify({ image: base64Data }),
         })
 
-        const result = await response.json()
+        const _result = await response.json()
         if (response.ok) {
-          alert("Face search successful!")
+          const result: SearchFacesByImageResponse = _result.response
+
+          setFaces([
+            {
+              boundingBox: {
+                Width: result.SearchedFaceBoundingBox?.Width ?? 0,
+                Height: result.SearchedFaceBoundingBox?.Height ?? 0,
+                Left: result.SearchedFaceBoundingBox?.Left ?? 0,
+                Top: result.SearchedFaceBoundingBox?.Top ?? 0,
+              },
+              confidence: result.SearchedFaceConfidence ?? 0,
+            },
+          ])
           console.log("Search result:", result)
         } else {
-          alert(`Face search failed: ${result.error}`)
+          alert(`Face search failed: ${_result.error}`)
         }
       }
     } catch (error) {
@@ -74,19 +91,17 @@ export function SearchFacesForm() {
             <FormItem>
               <FormLabel htmlFor="imageFile">Image</FormLabel>
               {value && (
-                <Image
-                  src={URL.createObjectURL(value)}
-                  alt="Uploaded Image"
-                  width={200}
-                  height={200}
+                <FaceBoundingBoxesImage
+                  imageUrl={URL.createObjectURL(value)}
+                  faces={faces}
                 />
               )}
-              <div style={{ width: "200px" }} className="relative">
+              <div className="relative">
                 <label
                   className={`${buttonVariants({
                     variant: "default",
                     size: "default",
-                  })} mt-2 block w-full`}
+                  })} mt-2`}
                   htmlFor="single"
                 >
                   {uploading ? "Uploading ..." : "Upload"}
@@ -115,9 +130,11 @@ export function SearchFacesForm() {
           name="imageFile"
           control={form.control}
         />
-        <Button disabled={uploading} type="submit">
-          {uploading ? "loading..." : "search faces"}
-        </Button>
+        {form.getValues("imageFile") && (
+          <Button disabled={uploading} type="submit">
+            {uploading ? "loading..." : "search face"}
+          </Button>
+        )}
       </form>
     </Form>
   )

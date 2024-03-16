@@ -30,6 +30,7 @@ export default function SearchFacesPage() {
               key={`${faceMatch.Face?.FaceId}-${index}`}
               faces={[faceMatch.Face as Face]}
               imageUrl={faceMatch?.imageUrl ?? ""}
+              similarity={faceMatch.Similarity}
             />
           ))}
         </div>

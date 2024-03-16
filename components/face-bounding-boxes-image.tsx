@@ -9,9 +9,10 @@ import { AspectRatio } from "./ui/aspect-ratio"
 type Props = {
   imageUrl: string
   faces: Face[]
+  similarity?: number
 }
 
-export function FaceBoundingBoxesImage({ imageUrl, faces }: Props) {
+export function FaceBoundingBoxesImage({ imageUrl, faces, similarity }: Props) {
   const containerRef = useRef<HTMLDivElement>(null)
   const [containerSize, setContainerSize] = useState<{
     width: number
@@ -40,6 +41,8 @@ export function FaceBoundingBoxesImage({ imageUrl, faces }: Props) {
       {faces.map((face, index) => {
         if (!face.BoundingBox) return null
         const { Left, Top, Width, Height } = face.BoundingBox
+
+        const similarityText = `Similarity: ${similarity?.toFixed(2)}%`
         const confidenceText = `Confidence: ${face.Confidence?.toFixed(2)}%`
 
         return (
@@ -51,7 +54,7 @@ export function FaceBoundingBoxesImage({ imageUrl, faces }: Props) {
                 top: Top ? `${Top * containerSize.height}px` : "",
                 width: Width ? `${Width * containerSize.width}px` : "",
                 height: Height ? `${Height * containerSize.height}px` : "",
-                border: "2px solid yellow",
+                border: similarity ? "2px solid green" : "2px solid yellow",
               }}
             ></div>
             <div
@@ -65,13 +68,13 @@ export function FaceBoundingBoxesImage({ imageUrl, faces }: Props) {
                         Height * containerSize.height
                       }px`
                     : "",
-                color: "yellow",
+                color: similarity ? "green" : "yellow",
                 backgroundColor: "rgba(0, 0, 0, 0.5)",
                 padding: "2px",
                 fontSize: "12px",
               }}
             >
-              {confidenceText}
+              {similarity ? similarityText : confidenceText}
             </div>
           </React.Fragment>
         )

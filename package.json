@@ -17,6 +17,7 @@
     "@aws-sdk/client-rekognition": "^3.529.1",
     "@aws-sdk/client-s3": "^3.529.1",
     "@aws-sdk/s3-presigned-post": "^3.529.1",
+    "@aws-sdk/s3-request-presigner": "^3.535.0",
     "@hookform/resolvers": "^3.3.4",
     "@radix-ui/react-aspect-ratio": "^1.0.3",
     "@radix-ui/react-label": "^2.0.2",

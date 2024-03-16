@@ -1,5 +1,3 @@
-"use client"
-
 import { Dispatch, SetStateAction, useState } from "react"
 import { useRouter } from "next/navigation"
 import { Face, SearchFacesByImageResponse } from "@aws-sdk/client-rekognition"
@@ -11,15 +9,17 @@ import { Button, buttonVariants } from "@/components/ui/button"
 import { Form, FormItem, FormLabel } from "@/components/ui/form"
 import { FaceBoundingBoxesImage } from "@/components/face-bounding-boxes-image"
 
+import { FaceMatchesWithImage } from "./page"
+
 const formSchema = z.object({
   imageFile: z.custom<File>().nullable(),
 })
 
 type Props = {
-  setMatchFaces: Dispatch<SetStateAction<Face[]>>
+  setFaceMatches: Dispatch<SetStateAction<FaceMatchesWithImage[]>>
 }
 
-export function SearchFacesForm({ setMatchFaces }: Props) {
+export function SearchFacesForm({ setFaceMatches }: Props) {
   const [uploading, setUploading] = useState(false)
   const [faces, setFaces] = useState<Face[]>([])
   const router = useRouter()
@@ -71,6 +71,24 @@ export function SearchFacesForm({ setMatchFaces }: Props) {
               Confidence: result.SearchedFaceConfidence ?? 0,
             },
           ])
+
+          if (!result.FaceMatches || result.FaceMatches.length === 0) return
+
+          const imageUrlsRequests = result.FaceMatches.map(
+            async (faceMatch) => {
+              const key = faceMatch.Face?.ExternalImageId
+              const imageUrlResponse = await fetch(`/api/s3/${key}`)
+              const imageUrl = await imageUrlResponse.json()
+              return {
+                ...faceMatch,
+                imageUrl: imageUrl.src,
+              }
+            }
+          )
+
+          const faceMatchesWithImages = await Promise.all(imageUrlsRequests)
+
+          setFaceMatches(faceMatchesWithImages)
           console.log("Search result:", result)
         } else {
           alert(`Face search failed: ${_result.error}`)

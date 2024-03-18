@@ -23,7 +23,6 @@ export async function POST(request: NextRequest) {
     const _request = await request.json()
     const { type, base64Data } = requestSchema.parse(_request)
 
-    console.log({ type, base64Data })
     const rekognitionClient = new RekognitionClient({
       region: process.env.AWS_REGION,
       credentials,

@@ -17,7 +17,7 @@ const formSchema = z.object({
 })
 
 export function CreateForm() {
-  const [uploading, setUploading] = useState(false)
+  const [loading, setLoading] = useState(false)
   const [faces, setFaces] = useState<Face[]>([])
 
   const router = useRouter()
@@ -29,7 +29,7 @@ export function CreateForm() {
   })
 
   const onSubmit = async (data: z.infer<typeof formSchema>) => {
-    setUploading(true)
+    setLoading(true)
     try {
       if (!data.imageFile) {
         alert("Please select a file to upload.")
@@ -99,7 +99,7 @@ export function CreateForm() {
       console.error("Error submitting form:", error)
       alert("Failed to index face due to a network or other error")
     } finally {
-      setUploading(false)
+      setLoading(false)
     }
   }
 
@@ -124,7 +124,7 @@ export function CreateForm() {
                   })} mt-2`}
                   htmlFor="single"
                 >
-                  {uploading ? "Uploading ..." : "Upload"}
+                  {loading ? "loading ..." : "Upload"}
                 </label>
 
                 <input
@@ -138,11 +138,11 @@ export function CreateForm() {
                   accept="image/*"
                   onChange={(e) => {
                     if (!e.target.files?.[0]) return
-                    setUploading(true)
+                    setLoading(true)
                     onChange(e.target.files?.[0] as File)
-                    setUploading(false)
+                    setLoading(false)
                   }}
-                  disabled={uploading}
+                  disabled={loading}
                 />
               </div>
             </FormItem>
@@ -151,8 +151,8 @@ export function CreateForm() {
           control={form.control}
         />
         {form.getValues("imageFile") && (
-          <Button disabled={uploading} type="submit">
-            {uploading ? "loading..." : "index face"}
+          <Button disabled={loading} type="submit">
+            {loading ? "loading..." : "create user"}
           </Button>
         )}
       </form>

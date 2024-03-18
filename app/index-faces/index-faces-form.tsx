@@ -7,6 +7,7 @@ import { zodResolver } from "@hookform/resolvers/zod"
 import { Controller, useForm } from "react-hook-form"
 import { z } from "zod"
 
+import { toBase64 } from "@/lib/utils"
 import { Button, buttonVariants } from "@/components/ui/button"
 import { Form, FormItem, FormLabel } from "@/components/ui/form"
 import { FaceBoundingBoxesImage } from "@/components/face-bounding-boxes-image"
@@ -34,14 +35,17 @@ export function IndexFacesForm() {
         alert("Please select a file to upload.")
         return
       }
+
+      const base64Data = await toBase64(data.imageFile)
+
       const response = await fetch("/api/s3/create-presigned-post", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          filename: data.imageFile.name,
-          contentType: data.imageFile.type,
+          base64Data,
+          type: data.imageFile.type,
         }),
       })
 
